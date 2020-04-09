@@ -6,14 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Data Prime Test</title>
   </head>
-  <body>
+  <body style="display: flex; justify-content: center; flex-direction: column;">
     <div class="shpereSettings" style="text-align: center;">
       <p>
-        Generated Sphere contains 100 dots
+        Generated Sphere contains 200 dots
       </p>
       <label for="visibleDotsQuantity">
         Visible dots quantity :
-        <input id="visibleDotsQuantity" type="number" value="40" />
+        <input id="visibleDotsQuantity" type="number" value="150" />
       </label>
       <br />
       <label for="visibleDotsQuantity">
@@ -21,11 +21,12 @@
         <input id="visibleSignsQuantity" type="number" value="10" />
       </label>
     </div>
-    <div style="margin: 10px; display: flex; justify-content: center;">
-      <canvas class="sphereCanvas" style="width: 700px;">
+    <div style="display: flex; justify-content: center; margin: 5px;">
+      <canvas class="sphereCanvas" style="width: 80vmin; height: 80vmin;">
         Canvas is not supported in your browser!
       </canvas>
     </div>
+
     <script type="text/javascript" src="script.js"></script>
   </body>
 </html>
