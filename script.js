@@ -6,6 +6,8 @@ const visibleSignsQuantityInput = document.querySelector(
 );
 const LOCAL_JSON_DATA_PATH = "./data.json";
 const CANVAS_FONT_SIZE = 14;
+const MAX_DOT_RADIUS = 6;
+const MIN_DOT_RADIUS = 2;
 
 //get canvas context and set context parameters
 canvas.width = canvas.clientWidth;
@@ -147,15 +149,27 @@ function initializeSphere(sphereInitData) {
   //generating new phi and theta angles for dots
   for (let sphereItem of sphereInitData) {
     let dot = getRandomDotCoords();
+    //minimal dot radius depends on phi angle
+    let minCurrentDotRadius =
+      MIN_DOT_RADIUS +
+      (MAX_DOT_RADIUS - MIN_DOT_RADIUS) *
+        (1 - (Math.sin(dot.phi / 2) * Math.cos(dot.phi / 2) + 1 / 2));
+    //phi Scale Factor defines boundries of Dot radius delta
+    let phiScaleFactor = Math.sin(dot.phi / 2) * Math.cos(dot.phi / 2) * 2;
     sphereData.items.push({
       ...sphereItem,
       phi: dot.phi,
       theta: dot.theta,
       x2D: 0,
       y2D: 0,
+      dotRadius: MIN_DOT_RADIUS,
+      dotAlpha: 1,
+      phiScaleFactor,
+      minCurrentDotRadius,
     });
   }
 
+  console.log(sphereData);
   //first draw initialize
   window.requestAnimationFrame(() => {
     updateSphere(sphereData);
@@ -185,6 +199,17 @@ function updateSphere(sphereData) {
       let dotProjectile = dotCoordsConversion(sphereItem.phi, sphereItem.theta);
       sphereItem.x2D = dotProjectile.x2D;
       sphereItem.y2D = dotProjectile.y2D;
+
+      //Calculating dot porjection radius
+      let thetaScale = Math.cos(sphereItem.theta + Math.PI / 2) / 2 + 1 / 2;
+      sphereItem.dotRadius =
+        sphereItem.minCurrentDotRadius +
+        (MAX_DOT_RADIUS - MIN_DOT_RADIUS) *
+          thetaScale *
+          sphereItem.phiScaleFactor;
+
+      //Calcultaing dot alpha
+      sphereItem.dotAlpha = thetaScale;
     });
 
     if (visibleDotsQuantity + visibleSignsQuantity > 200) {
@@ -194,13 +219,15 @@ function updateSphere(sphereData) {
 
     //drawing dots and signs
     for (let i = 0; i < visibleDotsQuantity + visibleSignsQuantity; i++) {
+      ctx.globalAlpha = sphereData.items[i].dotAlpha;
       if (currentDotsCount < visibleDotsQuantity) {
         //drawing dots
+
         ctx.beginPath();
         ctx.arc(
           sphereData.items[i].x2D,
           sphereData.items[i].y2D,
-          3,
+          sphereData.items[i].dotRadius,
           0,
           2 * Math.PI
         );
