@@ -10,13 +10,21 @@ const MAX_DOT_RADIUS = 6;
 const MIN_DOT_RADIUS = 2;
 
 //get canvas context and set context parameters
-canvas.width = canvas.clientWidth;
-canvas.height = canvas.clientHeight;
 const ctx = canvas.getContext("2d");
 ctx.font = CANVAS_FONT_SIZE + "px Arial";
 ctx.lineWidth = 1;
+// Retina display adjustment
+if (window.devicePixelRatio > 1) {
+  canvas.width = canvas.clientWidth * 2;
+  canvas.height = canvas.clientHeight * 2;
+  ctx.scale(2, 2);
+} else {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+}
 
 // canvas main data
+
 let canvasWidth = canvas.clientWidth;
 let canvasHeight = canvas.clientHeight;
 const sphereRadius = canvasHeight * 0.7;
@@ -201,7 +209,9 @@ function updateSphere(sphereData) {
       sphereItem.y2D = dotProjectile.y2D;
 
       //Calculating dot porjection radius
+      //Calculating theta scale
       let thetaScale = Math.cos(sphereItem.theta + Math.PI / 2) / 2 + 1 / 2;
+      //Calcultaing current dot radius
       sphereItem.dotRadius =
         sphereItem.minCurrentDotRadius +
         (MAX_DOT_RADIUS - MIN_DOT_RADIUS) *
@@ -209,7 +219,11 @@ function updateSphere(sphereData) {
           sphereItem.phiScaleFactor;
 
       //Calcultaing dot alpha
-      sphereItem.dotAlpha = thetaScale;
+      if (thetaScale + 0.5 > 1) {
+        sphereItem.dotAlpha = 1;
+      } else {
+        sphereItem.dotAlpha = thetaScale + 0.4;
+      }
     });
 
     if (visibleDotsQuantity + visibleSignsQuantity > 200) {
